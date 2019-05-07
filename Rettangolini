@@ -1,0 +1,50 @@
+package RettangoliCerchi;
+
+import java.awt.*;
+import javax.swing.*;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class Rettangolini{
+
+    public static void main(String[] args) {
+        Rettangolini prova = new Rettangolini();
+        prova.creaButton();
+    }
+
+
+    //Crea il frame con i Button (per ora un solo Button con la dimensione pari al frame)
+    public void creaButton(){
+        JFrame buttonFrame = new JFrame("Button");
+        Button btn = new Button("Random generation");
+        btn.setSize(500,500);
+        buttonFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        buttonFrame.add(btn);
+        buttonFrame.setSize(500, 500);
+        buttonFrame.setVisible(true);
+
+
+        btn.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                Rettangolini rect = new Rettangolini();
+                rect.creaFrame();
+            }
+        });
+    }
+
+    //Crea il frame che sarà popolato da maschi, femmine e figli
+    public void creaFrame(){
+        JFrame frame = new JFrame("Points");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 500);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+
+        paintComponent rect = new paintComponent();
+        frame.add(rect);
+
+    }
+}
