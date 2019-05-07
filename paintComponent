@@ -1,0 +1,157 @@
+package RettangoliCerchi;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Random;
+
+public class paintComponent extends JPanel {
+
+    public static final int coppieIniziali = 4; //numero di coppie iniziali (numero maschi = numero femmine; numero figli = 0)
+    public static final int numCoordinate = 2;//coordinate (x,y) di rettangoli e cerchi
+    public static final int distanzaStandard = 20;//distanza massima oltre la quale maschi e femmine non interagiscono
+
+    public int popIniziale = coppieIniziali * 2;//numero delle persone iniziali
+    public int popAttualeAdulta = popIniziale;
+    public int numMaschi = coppieIniziali;
+    public int numFemmine = coppieIniziali;
+    public int figlio = 0;
+    public int maschiMorti = 0;
+    public int femmineMorte = 0;
+
+    public float centroMaschi [][] = new float[coppieIniziali][numCoordinate]; //array con le coordinate dei maschi
+    public float centroFemmine [][] = new float[coppieIniziali][numCoordinate];//array con le coordinate delle femmine
+
+
+    public int contatore = 0; //utile per calcolare il numero di generazioni (numero di cicli eseguiti)
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        Graphics2D g2d = (Graphics2D) g;
+        do { contatore += 1;
+
+
+            for (int i = 0; i < coppieIniziali; i++) {
+
+                Dimension size = getSize();
+                int w = size.width;
+                int h = size.height;
+
+                Random r = new Random();
+
+                int xM = Math.abs(r.nextInt()) % w;
+                int yM = Math.abs(r.nextInt()) % h;
+                int sizeM = 15;
+                g2d.setColor(Color.blue);
+                g2d.drawRect(xM, yM, sizeM, sizeM);
+                centroMaschi[i][0] = xM + sizeM / 2;
+                centroMaschi[i][1] = yM + sizeM / 2;
+
+                int xF = Math.abs(r.nextInt()) % w;
+                int yF = Math.abs(r.nextInt()) % h;
+                int sizeF = 15;
+                g2d.setColor(Color.red);
+                g2d.drawOval(xF, yF, sizeF, sizeF);
+                centroFemmine[i][0] = xF + sizeF / 2;
+                centroFemmine[i][1] = yF + sizeF / 2;
+            }
+
+
+            for (int ii = 0; ii < coppieIniziali; ii++) {
+                for (int jj = 0; jj < coppieIniziali; jj++) {
+                    float distanzaTraCentriMF = (float) Math.sqrt((centroMaschi[ii][0] - centroFemmine[jj][0]) * (centroMaschi[ii][0] - centroFemmine[jj][0])
+                            + (centroMaschi[ii][1] - centroFemmine[jj][1]) * (centroMaschi[ii][1] - centroFemmine[jj][1]));
+                    float distanzaTraCentriMM = (float) Math.sqrt((centroMaschi[ii][0] - centroMaschi[jj][0]) * (centroMaschi[ii][0] - centroMaschi[jj][0])
+                            + (centroMaschi[ii][1] - centroMaschi[jj][1]) * (centroMaschi[ii][1] - centroMaschi[jj][1]));
+                    float distanzaTraCentriFF = (float) Math.sqrt((centroFemmine[ii][0] - centroFemmine[jj][0]) * (centroFemmine[ii][0] - centroFemmine[jj][0])
+                            + (centroFemmine[ii][1] - centroFemmine[jj][1]) * (centroFemmine[ii][1] - centroFemmine[jj][1]));
+
+                    if (distanzaTraCentriMF < distanzaStandard) {
+
+                        System.out.println("La distanza tra i centri MF è: " + distanzaTraCentriMF);
+                        System.out.println("È nato da un figlio dai genitori: maschio " + ii + " e femmina " + jj);
+
+                        g2d.setColor(Color.cyan);
+                        g2d.drawLine(Math.round(centroMaschi[ii][0]), Math.round(centroMaschi[ii][1]), Math.round(centroFemmine[jj][0]), Math.round(centroFemmine[jj][1]));
+                        Dimension size = getSize();
+                        int w = size.width;
+                        int h = size.height;
+                        Random r = new Random();
+                        int xC = Math.abs(r.nextInt()) % w;
+                        int yC = Math.abs(r.nextInt()) % h;
+                        int sizeC = 10;
+                        g2d.setColor(Color.green);
+
+                        g2d.drawOval(xC, yC, sizeC, sizeC);
+                        figlio = figlio + 1;
+
+                    } else if (distanzaTraCentriMM < distanzaStandard && ii != jj) {
+                        System.out.println("La distanza tra i centri MM è: " + distanzaTraCentriMM);
+                        System.out.println("Sono morti i maschi " + ii + " e " + jj);
+
+                        g2d.setColor(Color.blue);
+                        g2d.drawLine(Math.round(centroMaschi[ii][0]), Math.round(centroMaschi[ii][1]), Math.round(centroMaschi[jj][0]), Math.round(centroMaschi[jj][1]));
+                        maschiMorti = maschiMorti + 2; //perchè lo prende sia dalla combinazione ii,jj e da quella jj,ii
+                        centroMaschi[ii][0] = Float.NaN;
+                        centroMaschi[ii][1] = Float.NaN;
+                        centroMaschi[jj][0] = Float.NaN;
+                        centroMaschi[jj][1] = Float.NaN;
+
+                        //if(numMaschi == 0)
+                          //  break;
+
+                    } else if (distanzaTraCentriFF < distanzaStandard && ii != jj) {
+                        System.out.println("La distanza tra i centri FF è: " + distanzaTraCentriFF);
+                        System.out.println("Sono morte le femmine " + ii + " e " + jj);
+
+                        g2d.setColor(Color.red);
+                        g2d.drawLine(Math.round(centroFemmine[ii][0]), Math.round(centroFemmine[ii][1]), Math.round(centroFemmine[jj][0]), Math.round(centroFemmine[jj][1]));
+
+                        femmineMorte = femmineMorte + 2;//perchè lo prende sia dalla combinazione ii,jj e da quella jj,ii
+                        centroFemmine[ii][0] = Float.NaN;
+                        centroFemmine[ii][1] = Float.NaN;
+                        centroFemmine[jj][0] = Float.NaN;
+                        centroFemmine[jj][1] = Float.NaN;
+
+                        //if(numFemmine == 0)
+                          //  break;
+                    }
+                }
+            }
+
+
+            //Stampa gli array contenenti le coordinate di maschi e femmine
+            /*for (int k = 0; k < coppieIniziali; k++) {
+                for (int kk = 0; kk < numCoordinate; kk++) {
+                    System.out.print(centroMaschi[k][kk] + ", ");
+                }
+                System.out.println();
+            }
+            System.out.println();//lascia una riga tra la "matrice" maschi e la "matrice" femmine
+            for (int ind = 0; ind < coppieIniziali; ind++) {
+                for (int ind2 = 0; ind2 < numCoordinate; ind2++) {
+                    System.out.print(centroFemmine[ind][ind2] + ", ");
+                }
+                System.out.println();
+            }*/
+
+            System.out.println("Sono nati " + figlio + " figli");
+            System.out.println("Sono morti " + maschiMorti + " maschi");
+            System.out.println("Sono morte " + femmineMorte + " femmine");
+
+            popAttualeAdulta = popAttualeAdulta - (maschiMorti + femmineMorte);
+            numMaschi = numMaschi - maschiMorti;
+            numFemmine = numFemmine - femmineMorte;
+            System.out.println("Numero di persone adulte vive " + popAttualeAdulta + ": \n" +
+                    numMaschi + " maschi;\n" + numFemmine + " femmine;\n" + figlio + " figli;");
+
+            System.out.println("\nNuova generazione");
+
+            new JFrame();
+
+        } while (numFemmine > 0 && numMaschi >0);
+
+        System.out.println("Dopo " + contatore + " generazioni la popolazione iniziale di" + popIniziale + " persone si è estinta");
+    }
+
+}
